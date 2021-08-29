@@ -1,7 +1,11 @@
-# Lua
+# Lua Fork 
 
-This is the repository of Lua development code, as seen by the Lua team. It contains the full history of all commits but is mirrored irregularly. For complete information about Lua, visit [Lua.org](https://www.lua.org/).
+This adds a CMakeLists to the source repo and constructs the basic set of targets for use with C++.
 
-Please **do not** send pull requests. To report issues, post a message to the [Lua mailing list](https://www.lua.org/lua-l.html).
+No functionality was added/modifed/removed - this fork contains purely structural changes.
 
-Download official Lua releases from [Lua.org](https://www.lua.org/download.html).
+The only new code file added is lua.hpp which exists purely to ease interopt between lua and C++
+
+
+[main lua repo](https://github.com/lua/lua)
+
