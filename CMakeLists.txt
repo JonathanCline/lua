@@ -25,6 +25,11 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 # Woo lua!
 project(lua VERSION ${lua_version} LANGUAGES C HOMEPAGE_URL "https://github.com/JonathanCline/lua")
 
+# Options for controlling installation
+option(LUA_INSTALL "Allows lua targets to be installed" ON)
+option(LUA_INSTALL_EXECUTABLE "Enables the lua executable to be installed, LUA_INSTALL must be ON" ON)
+option(LUA_INSTALL_STATIC_LIBRARY "Enables the lua static library to be installed, LUA_INSTALL must be ON" ON)
+option(LUA_INSTALL_DYNAMIC_LIBRARY "Enables the lua dynamic library to be installed, LUA_INSTALL must be ON" ON)
 
 # Lua include headers
 set(lua_include_lib
@@ -124,16 +129,32 @@ target_include_directories(lua
 	PRIVATE ${lua_source_dir}
 )
 
-
 # Install configuration
-install(TARGETS lua DESTINATION "bin/")
-install(TARGETS liblua DESTINATION "lib/")
-install(TARGETS libluadll DESTINATION "lib/")
+if (LUA_INSTALL) 
 
-# Header file install configuration
-foreach (fpath IN LISTS lua_include_lib)
-	install(FILES "${fpath}" DESTINATION "include/")
-endforeach()
+  # Executable install
+  if (LUA_INSTALL_EXECUTABLE)
+    install(TARGETS lua DESTINATION "bin/")
+  endif()
+  
+  # Static library install
+  if (LUA_INSTALL_STATIC_LIBRARY)
+    install(TARGETS liblua DESTINATION "lib/")
+  endif()
+
+  # Dynamic library install
+  if (LUA_INSTALL_DYNAMIC_LIBRARY)
+    install(TARGETS libluadll DESTINATION "lib/")
+  endif()
+    
+  # Header file install configuration
+  if (LUA_INSTALL_STATIC_LIBRARY OR LUA_INSTALL_DYNAMIC_LIBRARY)
+    foreach (fpath IN LISTS lua_include_lib)
+      install(FILES "${fpath}" DESTINATION "include/")
+    endforeach()
+  endif()
+
+endif()
 
 
 # Add library alias targets for eas of use
