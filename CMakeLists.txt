@@ -16,9 +16,6 @@ set(lua_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(lua_include_dir "include")
 
 
-
-
-
 # Basic cmake setup
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
@@ -97,12 +94,18 @@ list(TRANSFORM lua_include_lib PREPEND "${lua_include_dir}/")
 
 
 
+# The list of public include directories
+set(lua_public_include ${lua_include_dir})
+
+# The list of private include directories
+set(lua_private_include ${lua_source_dir})
+
 
 # Lua static library target
 add_library(liblua ${lua_src_core} ${lua_src_lib})
 target_include_directories(liblua
-	PUBLIC ${lua_include_dir}
-	PRIVATE ${lua_source_dir}
+	PUBLIC ${lua_public_include}
+	PRIVATE ${lua_private_include}
 )
 
 
@@ -110,8 +113,8 @@ target_include_directories(liblua
 # Lua shared library target
 add_library(libluadll SHARED ${lua_src_core} ${lua_src_lib} )
 target_include_directories(libluadll
-	PUBLIC ${lua_include_dir}
-	PRIVATE ${lua_source_dir}
+  PUBLIC ${lua_public_include}
+  PRIVATE ${lua_private_include}
 )
 
 
@@ -126,7 +129,7 @@ set_target_properties(libluadll PROPERTIES OUTPUT_NAME lua53)
 add_executable(lua ${lua_src})
 target_link_libraries(lua libluadll)
 target_include_directories(lua
-	PRIVATE ${lua_source_dir}
+	PRIVATE ${lua_private_include}
 )
 
 # Install configuration
