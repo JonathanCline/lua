@@ -1,20 +1,9 @@
-#pragma once
-#ifndef LUA_HPP
-#define LUA_HPP
+// lua.hpp
+// Lua header files for C++
+// <<extern "C">> not supplied automatically because Lua also compiles as C++
 
-// Adds the extern "C" directive around C source headers
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-
-#ifdef __cplusplus
-};
-#endif
-
-#endif
+extern "C" {
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+}
