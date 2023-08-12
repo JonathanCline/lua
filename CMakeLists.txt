@@ -28,6 +28,9 @@ option(LUA_INSTALL_EXECUTABLE "Enables the lua executable to be installed, LUA_I
 option(LUA_INSTALL_STATIC_LIBRARY "Enables the lua static library to be installed, LUA_INSTALL must be ON" ON)
 option(LUA_INSTALL_DYNAMIC_LIBRARY "Enables the lua dynamic library to be installed, LUA_INSTALL must be ON" ON)
 
+option(LUA_BUILD_EXECUTABLE "Enables the standlone lua executable to be built" ON)
+
+
 # Lua include headers
 set(lua_include_lib
 	lua.hpp
@@ -109,34 +112,34 @@ target_include_directories(liblua
 )
 
 
-
 # Lua shared library target
-add_library(libluadll SHARED ${lua_src_core} ${lua_src_lib} )
-target_include_directories(libluadll
-  PUBLIC ${lua_public_include}
-  PRIVATE ${lua_private_include}
-)
-
-
-
-target_compile_definitions(libluadll
-	PRIVATE _CRT_SECURE_NO_WARNINGS LUA_BUILD_AS_DLL )
-set_target_properties(libluadll PROPERTIES OUTPUT_NAME lua53)
-
+if (WIN32)
+  add_library(libluadll SHARED ${lua_src_core} ${lua_src_lib} )
+  target_include_directories(libluadll
+    PUBLIC ${lua_public_include}
+    PRIVATE ${lua_private_include}
+  )
+  target_compile_definitions(libluadll
+    PRIVATE _CRT_SECURE_NO_WARNINGS LUA_BUILD_AS_DLL )
+  set_target_properties(libluadll PROPERTIES OUTPUT_NAME lua53)
+endif()
 
 
 # Lua command line executable target
-add_executable(lua ${lua_src})
-target_link_libraries(lua libluadll)
-target_include_directories(lua
-	PRIVATE ${lua_private_include}
-)
+if(LUA_BUILD_EXECUTABLE AND TARGET libluadll)
+  add_executable(lua ${lua_src})
+  target_link_libraries(lua libluadll)
+  target_include_directories(lua
+    PRIVATE ${lua_private_include}
+    PUBLIC ${lua_public_include}
+  )
+endif()
 
 # Install configuration
 if (LUA_INSTALL) 
 
   # Executable install
-  if (LUA_INSTALL_EXECUTABLE)
+  if (LUA_INSTALL_EXECUTABLE AND TARGET lua)
     install(TARGETS lua DESTINATION "bin/")
   endif()
   
@@ -146,7 +149,7 @@ if (LUA_INSTALL)
   endif()
 
   # Dynamic library install
-  if (LUA_INSTALL_DYNAMIC_LIBRARY)
+  if (LUA_INSTALL_DYNAMIC_LIBRARY AND TARGET libluadll)
     install(TARGETS libluadll DESTINATION "lib/")
   endif()
     
@@ -166,5 +169,7 @@ endif()
 add_library(lua::lua ALIAS liblua)
 
 # Shared library for the lua C API 
-add_library(lua::luadll ALIAS libluadll)
+if (TARGET libluadll)
+  add_library(lua::luadll ALIAS libluadll)
+endif()
 
